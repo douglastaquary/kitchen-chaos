@@ -36,7 +36,20 @@ await title.close();
 
 await state(1440, 900, 'busy-kitchen', 'gameplay.png');
 await state(1440, 900, 'results', 'results.png');
-await state(390, 844, 'busy-kitchen', 'mobile.png');
+// Phone in landscape with touch controls visible.
+{
+  const context = await browser.newContext({ viewport: { width: 844, height: 390 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 });
+  const page = await context.newPage();
+  await page.goto(base);
+  await page.waitForFunction(() => window.__THREE_GAME_TEST_HOOKS__ && window.__THREE_GAME_DIAGNOSTICS__?.phase === 'title', null, { timeout: 60000 });
+  await page.waitForTimeout(600);
+  await page.screenshot({ path: `${out}/mobile-landscape-title.png` });
+  await page.evaluate(() => window.__THREE_GAME_TEST_HOOKS__.setState('busy-kitchen'));
+  await page.waitForTimeout(900);
+  await page.screenshot({ path: `${out}/mobile-landscape.png` });
+  console.log('captured mobile-landscape.png');
+  await context.close();
+}
 
 // A real autoplay moment: both chefs working mid-service.
 const live = await open(1440, 900, '?autoplay');

@@ -12,9 +12,13 @@ Demo de um jogo de cozinha no estilo *Overcooked*, feito para rodar direto no na
 | --- | --- |
 | ![Tela inicial com o duelo You vs. BrandynBot](docs/screenshots/title.png) | ![Meio da partida com tickets, panelas no fogo e pratos montados](docs/screenshots/gameplay.png) |
 
-| Fim de partida | Celular |
+| Fim de partida | Celular em paisagem |
 | --- | --- |
-| ![Tela de vitória com o placar dos dois chefs](docs/screenshots/results.png) | <img src="docs/screenshots/mobile.png" alt="Versão para celular com controles de toque" width="220"> |
+| ![Tela de vitória com o placar dos dois chefs](docs/screenshots/results.png) | ![Partida no celular deitado com joystick e botões de toque](docs/screenshots/mobile-landscape.png) |
+
+| Tela inicial no celular |
+| --- |
+| ![Tela inicial compacta no celular deitado](docs/screenshots/mobile-landscape-title.png) |
 
 ## Como jogar
 
