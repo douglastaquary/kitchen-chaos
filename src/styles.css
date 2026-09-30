@@ -1022,3 +1022,302 @@ body.touch #touch-controls.active {
     font-size: 16px;
   }
 }
+
+/* ---------- Mobile: fullscreen + landscape ---------- */
+html,
+body {
+  overscroll-behavior: none;
+}
+
+.icon-button {
+  color: var(--ink);
+}
+
+.touch-only,
+.touch-help,
+.ios-hint {
+  display: none;
+}
+
+body.touch .touch-only {
+  display: grid;
+}
+
+body.touch.standalone .touch-only,
+body.touch.no-fullscreen .touch-only {
+  display: none;
+}
+
+body.touch .touch-help {
+  display: flex;
+}
+
+body.touch .key-help {
+  display: none;
+}
+
+body.touch.no-fullscreen:not(.standalone) .ios-hint {
+  display: block;
+  margin: 10px 0 0;
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+#rotate-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: none;
+  place-items: center;
+  padding: var(--safe-t) var(--safe-r) var(--safe-b) var(--safe-l);
+  background: #f3d6ae;
+}
+
+#rotate-screen .tagline {
+  margin-bottom: 0;
+}
+
+.rotate-icon svg {
+  width: 84px;
+  height: 84px;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: rotateHint 2.2s ease-in-out infinite;
+}
+
+.rotate-icon rect {
+  fill: var(--teal);
+}
+
+@keyframes rotateHint {
+  0%,
+  25% {
+    transform: rotate(0deg);
+  }
+  55%,
+  85% {
+    transform: rotate(-90deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (orientation: portrait) {
+  body.touch #rotate-screen {
+    display: grid;
+  }
+}
+
+/* Phones in landscape: short screens need compact panels and controls. */
+@media (max-height: 520px) {
+  .screen {
+    padding-top: max(8px, env(safe-area-inset-top));
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  .panel {
+    padding: 12px 18px 14px;
+    border-radius: 22px;
+  }
+
+  .title-panel {
+    width: min(620px, 100%);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    column-gap: 18px;
+  }
+
+  .title-panel .bubble-title {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    font-size: 46px;
+    -webkit-text-stroke-width: 8px;
+  }
+
+  .title-panel .tagline {
+    grid-column: 2;
+    margin: 0 0 8px;
+    font-size: 14px;
+  }
+
+  .title-panel .versus-row {
+    grid-column: 2;
+    margin-bottom: 8px;
+    gap: 8px;
+  }
+
+  .title-panel .versus-card {
+    width: 96px;
+    padding: 4px 4px 6px;
+    border-radius: 16px;
+  }
+
+  .title-panel .versus-card img {
+    width: 58px;
+    height: 58px;
+  }
+
+  .title-panel > .btn,
+  .title-panel .controls-help,
+  .title-panel .ios-hint,
+  .title-panel #load-bar {
+    grid-column: 1 / 3;
+  }
+
+  .title-panel .controls-help {
+    margin-top: 10px;
+  }
+
+  .btn {
+    min-height: 46px;
+    font-size: 19px;
+  }
+
+  .btn-cream {
+    min-height: 40px;
+    font-size: 16px;
+  }
+
+  .small-panel {
+    gap: 8px;
+  }
+
+  .bubble-title.small {
+    font-size: 34px;
+  }
+
+  .results-panel .bubble-title {
+    font-size: 40px;
+  }
+
+  .results-cards {
+    gap: 10px;
+    margin: 4px 0 6px;
+  }
+
+  .result-card {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    column-gap: 10px;
+    align-items: center;
+    padding: 8px 12px;
+  }
+
+  .result-card img {
+    grid-row: 1 / 3;
+    width: 52px;
+    height: 52px;
+    margin: 0;
+  }
+
+  .result-card .who {
+    text-align: left;
+    font-size: 15px;
+  }
+
+  .result-card .total {
+    justify-content: flex-start;
+    margin: 2px 0 0;
+    font-size: 26px;
+  }
+
+  .result-card .total .coin-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  .result-card dl {
+    grid-column: 1 / 3;
+    margin-top: 6px;
+    font-size: 12px;
+  }
+
+  .result-card .crown {
+    top: -18px;
+    width: 34px;
+  }
+
+  .results-panel {
+    width: min(560px, 100%);
+  }
+
+  .coin-badge {
+    min-width: 104px;
+    padding: 2px 10px 2px 4px;
+    grid-template-columns: 24px auto;
+    column-gap: 6px;
+  }
+
+  .coin-badge .coin-icon {
+    width: 24px;
+    height: 24px;
+    border-width: 2px;
+  }
+
+  .coin-name {
+    font-size: 10px;
+  }
+
+  .coin-value {
+    font-size: 18px;
+  }
+
+  #hud-left,
+  #hud-right {
+    gap: 6px;
+  }
+
+  .ticket {
+    width: 56px;
+    padding-bottom: 4px;
+  }
+
+  .ticket-dish {
+    width: 34px;
+    height: 34px;
+  }
+
+  .results-sub {
+    margin: 4px 0 8px;
+  }
+
+  .results-actions {
+    gap: 10px;
+  }
+
+  #touch-stick {
+    width: 112px;
+  }
+
+  #touch-buttons {
+    gap: 8px;
+  }
+
+  .touch-btn {
+    width: 58px;
+    height: 58px;
+    font-size: 13px;
+  }
+
+  .touch-btn.big {
+    width: 74px;
+    height: 74px;
+    font-size: 16px;
+  }
+
+  .touch-btn.small {
+    width: 48px;
+    height: 48px;
+    font-size: 11px;
+  }
+
+  .icon-button {
+    width: 40px;
+    height: 40px;
+  }
+}

@@ -34,6 +34,8 @@ A partida dura **2 minutos e 30 segundos**. Os pedidos aparecem como tickets no 
 
 O chef sempre interage com a bancada para a qual está virado, que fica destacada com um brilho.
 
+**No celular** o jogo roda em modo paisagem: ao tocar em *Start cooking!* ele entra em tela cheia e, no Android, trava a orientação. Com o celular em pé, aparece um aviso para girar, e a partida fica pausada. No iPhone, o Safari não permite tela cheia em páginas, então use **Compartilhar → Adicionar à Tela de Início** e abra o jogo pelo ícone. Ele abre em tela cheia e em paisagem.
+
 ### A cozinha
 
 - **Metade verde (esquerda):** a sua cozinha. Metade vermelha (direita): a do BrandynBot. Você não pode usar as estações do rival, e o jogo avisa com *"Not your kitchen!"*.

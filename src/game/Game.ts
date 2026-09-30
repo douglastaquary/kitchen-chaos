@@ -6,6 +6,7 @@ import { batchStatic } from '../assets/StaticBatcher';
 import { createContactShadowTexture } from '../assets/Textures';
 import { InputController } from '../core/InputController';
 import { Loop } from '../core/Loop';
+import { MobileScreen } from '../core/MobileScreen';
 import { createRenderer, resizeRenderer } from '../core/Renderer';
 import { AudioSystem } from '../systems/AudioSystem';
 import { DebugTools, type DebugTuning } from '../systems/DebugTools';
@@ -45,6 +46,7 @@ export class Game {
   private readonly audio = new AudioSystem();
   private readonly vfx = new Vfx();
   private readonly lib = new AssetLibrary();
+  private readonly mobile = new MobileScreen();
   private readonly loop = new Loop(
     (delta) => this.update(delta),
     () => this.render(),
@@ -105,7 +107,10 @@ export class Game {
       this.cameraKey = '';
     });
 
-    if (window.matchMedia?.('(pointer: coarse)').matches || 'ontouchstart' in window) document.body.classList.add('touch');
+    this.mobile.onChange(() => {
+      this.cameraKey = '';
+      if (this.mobile.portrait) this.setPaused(true);
+    });
 
     buildLights(this.scene);
     this.vfx.reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
@@ -240,6 +245,7 @@ export class Game {
     getEl('#resume-button').addEventListener('click', () => this.setPaused(false));
     getEl('#restart-button').addEventListener('click', () => this.startMatch());
     getEl('#pause-button').addEventListener('click', () => this.setPaused(true));
+    getEl('#fullscreen-button').addEventListener('click', () => void this.mobile.toggleFullscreen());
     getEl('#mute-button').addEventListener('click', () => {
       this.audio.setMuted(!this.audio.muted);
       this.hud.setMuteLabel(this.audio.muted);
@@ -291,6 +297,7 @@ export class Game {
 
   private startMatch(): void {
     if (this.phase === 'loading' || !this.kitchen) return;
+    void this.mobile.enterLandscapeFullscreen();
     void this.audio.unlock();
     this.resetMatch();
     this.phase = 'countdown';
@@ -338,7 +345,9 @@ export class Game {
       else if (this.phase === 'paused') this.setPaused(false);
     }
 
-    if (this.phase === 'countdown') this.updateCountdown(delta);
+    const rotateNeeded = this.mobile.portrait;
+    if (rotateNeeded && this.phase === 'playing') this.setPaused(true);
+    if (this.phase === 'countdown' && !rotateNeeded) this.updateCountdown(delta);
     if (this.phase === 'playing') this.updateMatch(delta);
     else this.input.flush();
 
@@ -624,6 +633,8 @@ export class Game {
     this.camera.fov = portrait ? 44 : 34;
     this.camera.updateProjectionMatrix();
     const bottomLimit = -0.94;
+    // On touch landscape the stick and buttons sit in the bottom corners; keep the kitchen between them.
+    const sideLimit = this.mobile.touch && !portrait ? Math.max(0.5, 1 - (2 * 150) / w) : 0.97;
     const topLimit = THREE.MathUtils.clamp(1 - (2 * (hudBottom + 6)) / h, 0.2, 0.95);
     const hx = GRID_W / 2;
     const hz = GRID_H / 2;
@@ -662,7 +673,7 @@ export class Game {
         shiftZ -= (((r.maxY + r.minY) / 2 - want) * d * halfTan) / Math.sin(CAMERA_PITCH);
       }
       const r = place(d, shiftZ);
-      return { shiftZ, ok: r.maxX <= 0.97 && r.minY >= bottomLimit && r.maxY <= topLimit };
+      return { shiftZ, ok: r.maxX <= sideLimit && r.minY >= bottomLimit && r.maxY <= topLimit };
     };
     let lo = 4;
     let hi = 120;
