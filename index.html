@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f3d6ae" />
+    <meta name="description" content="Kitchen Chaos — a cozy head-to-head cooking game in your browser." />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='36' r='24' fill='%23fff'/><path d='M32 12c-6-8-14-6-14-6s2 8 14 6zm0 0c6-8 14-6 14-6s-2 8-14 6z' fill='%237cc957'/><circle cx='24' cy='36' r='3'/><circle cx='40' cy='36' r='3'/></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet" />
+    <title>Kitchen Chaos</title>
+  </head>
+  <body>
+    <main id="app">
+      <canvas id="game-canvas" aria-label="Kitchen Chaos game canvas"></canvas>
+
+      <div id="name-tags" aria-hidden="true"></div>
+      <div id="floaters" aria-hidden="true"></div>
+
+      <section id="hud" class="hidden" aria-live="polite">
+        <div id="hud-left">
+          <div class="coin-badge" id="player-coins">
+            <span class="coin-icon"></span>
+            <span class="coin-name">You</span>
+            <strong class="coin-value">0</strong>
+          </div>
+          <div id="tickets"></div>
+        </div>
+        <div id="hud-timer">
+          <div class="clock-face">
+            <svg viewBox="0 0 64 64" class="clock-ring" aria-hidden="true">
+              <circle cx="32" cy="32" r="27" class="clock-track" />
+              <circle cx="32" cy="32" r="27" class="clock-fill" id="clock-fill" />
+            </svg>
+            <strong id="timer-value">2:30</strong>
+          </div>
+        </div>
+        <div id="hud-right">
+          <div class="coin-badge rival" id="bot-coins">
+            <span class="coin-icon"></span>
+            <span class="coin-name">BrandynBot</span>
+            <strong class="coin-value">0</strong>
+          </div>
+          <div id="bot-tickets" aria-label="Rival tickets"></div>
+          <button id="pause-button" class="icon-button" type="button" aria-label="Pause">
+            <svg viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.5" /><rect x="14" y="5" width="4" height="14" rx="1.5" /></svg>
+          </button>
+        </div>
+      </section>
+
+      <div id="banner" class="hidden"></div>
+
+      <section id="title-screen" class="screen">
+        <div class="panel title-panel">
+          <h1 class="bubble-title"><span>Kitchen</span><span>Chaos</span></h1>
+          <p class="tagline">Out-cook the rival chef before the timer runs out!</p>
+          <div class="versus-row">
+            <div class="versus-card you">
+              <img id="title-player-img" alt="" />
+              <strong>You</strong>
+            </div>
+            <div class="vs">VS</div>
+            <div class="versus-card rival">
+              <img id="title-bot-img" alt="" />
+              <strong>BrandynBot</strong>
+            </div>
+          </div>
+          <button id="play-button" class="btn btn-coral" type="button" disabled>Loading kitchen…</button>
+          <div class="controls-help">
+            <div><kbd>WASD</kbd> move</div>
+            <div><kbd>E</kbd>/<kbd>Space</kbd> grab &amp; drop</div>
+            <div><kbd>F</kbd> hold to chop</div>
+            <div><kbd>Shift</kbd> dash</div>
+          </div>
+          <div id="load-bar"><div id="load-fill"></div></div>
+        </div>
+      </section>
+
+      <section id="countdown" class="screen hidden" aria-live="assertive"><strong id="countdown-value">3</strong></section>
+
+      <section id="pause-screen" class="screen hidden">
+        <div class="panel small-panel">
+          <h2 class="bubble-title small"><span>Paused</span></h2>
+          <button id="resume-button" class="btn btn-teal" type="button">Resume</button>
+          <button id="restart-button" class="btn btn-coral" type="button">Restart</button>
+          <button id="mute-button" class="btn btn-cream" type="button">Sound: On</button>
+          <button id="quit-button" class="btn btn-cream" type="button">Lobby</button>
+        </div>
+      </section>
+
+      <section id="results-screen" class="screen hidden">
+        <div class="panel results-panel">
+          <h2 class="bubble-title" id="results-title"><span>Victory</span></h2>
+          <div class="results-cards">
+            <div class="result-card" id="result-player"></div>
+            <div class="result-card" id="result-bot"></div>
+          </div>
+          <p class="results-sub" id="results-sub">Rematch? The kitchen is still hot.</p>
+          <div class="results-actions">
+            <button id="rematch-button" class="btn btn-coral" type="button">Rematch</button>
+            <button id="lobby-button" class="btn btn-teal" type="button">Lobby</button>
+          </div>
+        </div>
+      </section>
+
+      <div id="touch-controls" aria-hidden="true">
+        <div id="touch-stick"><div id="touch-knob"></div></div>
+        <div id="touch-buttons">
+          <button id="dash-button" class="touch-btn small" type="button">Dash</button>
+          <button id="chop-button" class="touch-btn" type="button">Chop</button>
+          <button id="grab-button" class="touch-btn big" type="button">Grab</button>
+        </div>
+      </div>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
