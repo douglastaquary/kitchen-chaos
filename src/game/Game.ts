@@ -636,8 +636,8 @@ export class Game {
   // ---------- Camera + render ----------
 
   /**
-   * Fit the kitchen to the full viewport. HUD/touch controls overlay the scene, so we do not
-   * reserve space for them — the brick apron only shows if the aspect leaves leftover edges.
+   * Fit the kitchen to the viewport. HUD overlays the scene, but the front cutting row
+   * (where chefs chop) must stay fully on screen — that was getting clipped.
    */
   private fitCamera(): void {
     const w = this.canvas.clientWidth;
@@ -648,26 +648,33 @@ export class Game {
 
     const portrait = w / h < 1;
     const phoneLandscape = this.mobile.touch && !portrait && h <= 520;
-    this.camera.fov = portrait ? 42 : phoneLandscape ? 26 : 32;
+    this.camera.fov = portrait ? 42 : phoneLandscape ? 30 : 34;
     this.camera.updateProjectionMatrix();
 
-    // Fill the screen edge-to-edge. On short phones, ignore width so height wins (sides may crop).
-    const bottomLimit = -0.995;
-    const topLimit = 0.995;
-    const sideLimit = phoneLandscape ? 99 : portrait ? 0.98 : this.mobile.touch ? 1.25 : 1.05;
+    // Keep a real bottom margin so cutting boards + chopping chefs aren't clipped.
+    const bottomLimit = phoneLandscape ? -0.88 : -0.9;
+    const topLimit = phoneLandscape ? 0.96 : 0.94;
+    const sideLimit = phoneLandscape ? 1.35 : portrait ? 0.98 : this.mobile.touch ? 1.15 : 1.02;
 
     const hx = GRID_W / 2;
     const hz = GRID_H / 2;
+    // Front = high world Z (bottom of screen). Include counter face, floor apron, and chef height.
     const points = [
-      new THREE.Vector3(-hx, 0.85, hz),
-      new THREE.Vector3(hx, 0.85, hz),
-      new THREE.Vector3(-hx, 1.0, -hz),
-      new THREE.Vector3(hx, 1.0, -hz),
+      new THREE.Vector3(-hx, 0, hz + 0.55),
+      new THREE.Vector3(hx, 0, hz + 0.55),
+      new THREE.Vector3(-hx, 0.95, hz + 0.15),
+      new THREE.Vector3(hx, 0.95, hz + 0.15),
+      new THREE.Vector3(-hx * 0.55, 1.35, hz - 0.85),
+      new THREE.Vector3(hx * 0.55, 1.35, hz - 0.85),
+      new THREE.Vector3(-hx, 1.15, -hz),
+      new THREE.Vector3(hx, 1.15, -hz),
     ];
     const dir = new THREE.Vector3(0, Math.sin(CAMERA_PITCH), Math.cos(CAMERA_PITCH));
-    const target = new THREE.Vector3(0, 0.35, 0);
+    // Bias look slightly toward the front counters.
+    const target = new THREE.Vector3(0, 0.25, 0.45);
     const halfTan = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
-    const want = (topLimit + bottomLimit) / 2;
+    // Prefer a bit more room at the bottom than at the top.
+    const want = bottomLimit + (topLimit - bottomLimit) * 0.52;
     const place = (d: number, shiftZ: number) => {
       this.camera.position.copy(target).setZ(target.z + shiftZ).addScaledVector(dir, d);
       this.camera.lookAt(target.x, target.y, target.z + shiftZ);
@@ -692,31 +699,20 @@ export class Game {
       const r = place(d, shiftZ);
       const heightOk = r.minY >= bottomLimit && r.maxY <= topLimit;
       const widthOk = r.maxX <= sideLimit;
-      return { shiftZ, ok: heightOk && widthOk, span: r.maxY - r.minY };
+      return { shiftZ, ok: heightOk && widthOk, span: r.maxY - r.minY, minY: r.minY };
     };
-    const band = topLimit - bottomLimit;
     let lo = 4;
     let hi = 120;
-    if (phoneLandscape) {
-      // Pure height fit: find the closest distance whose projected kitchen height equals the screen.
-      for (let i = 0; i < 30; i += 1) {
-        const mid = (lo + hi) / 2;
-        if (centred(mid).span > band) lo = mid;
-        else hi = mid;
-      }
-    } else {
-      for (let i = 0; i < 28; i += 1) {
-        const mid = (lo + hi) / 2;
-        if (centred(mid).ok) hi = mid;
-        else lo = mid;
-      }
-      for (let i = 0; i < 24; i += 1) {
-        const c = centred(hi);
-        if (c.span >= band * 0.97 || hi < 6) break;
-        const next = hi * 0.96;
-        if (!centred(next).ok) break;
-        hi = next;
-      }
+    for (let i = 0; i < 28; i += 1) {
+      const mid = (lo + hi) / 2;
+      if (centred(mid).ok) hi = mid;
+      else lo = mid;
+    }
+    // Pull back a touch if the front apron still sits too close to the edge.
+    for (let i = 0; i < 12; i += 1) {
+      const c = centred(hi);
+      if (c.minY >= bottomLimit + 0.02) break;
+      hi *= 1.03;
     }
     place(hi, centred(hi).shiftZ);
     this.camera.far = hi + 80;
