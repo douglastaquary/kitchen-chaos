@@ -202,7 +202,8 @@ export class Kitchen {
       ind.badgeMat.needsUpdate = true;
     }
     if (badge) {
-      const s = 0.42 + (state === 'warning' ? Math.sin(time * 14) * 0.04 : 0);
+      const pulse = state === 'done' ? 0.08 + Math.sin(time * 8) * 0.04 : state === 'warning' ? Math.sin(time * 14) * 0.06 : 0;
+      const s = 0.58 + pulse;
       ind.badge.scale.set(s, s, 1);
     }
   }

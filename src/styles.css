@@ -162,10 +162,11 @@ body,
   width: max-content;
   min-width: 132px;
   padding: 5px 14px 5px 6px;
-  border: 3px solid var(--ink);
+  border: 3px solid rgba(44, 44, 70, 0.7);
   border-radius: 18px;
-  background: var(--cream);
-  box-shadow: 0 4px 0 rgba(44, 44, 70, 0.25);
+  background: rgba(253, 246, 231, 0.58);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 3px 0 rgba(44, 44, 70, 0.14);
 }
 
 .coin-badge.rival {
@@ -223,23 +224,30 @@ body,
 
 #tickets {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: nowrap;
-  min-height: 118px;
+  min-height: 0;
 }
 
 .ticket {
   position: relative;
   flex: 0 0 auto;
-  width: 96px;
-  padding: 0 0 6px;
+  width: 76px;
+  padding: 0 0 4px;
   overflow: hidden;
-  border: 3px solid var(--ink);
-  border-radius: 14px;
-  background: #fffdf7;
-  box-shadow: 0 4px 0 rgba(44, 44, 70, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 11px;
+  /* White glass: frosted overlay so the floor color doesn't tint the card. */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.18)),
+    rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(16px) saturate(1.05);
+  -webkit-backdrop-filter: blur(16px) saturate(1.05);
+  box-shadow:
+    0 2px 8px rgba(44, 44, 70, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
   animation: ticketIn 0.35s cubic-bezier(0.2, 1.4, 0.4, 1);
-  transition: transform 0.2s;
+  transition: transform 0.2s, background 0.2s;
 }
 
 .ticket.leaving {
@@ -247,10 +255,13 @@ body,
 }
 
 .ticket.served {
-  border-color: var(--good);
+  border-color: rgba(70, 195, 123, 0.7);
+  background: rgba(200, 245, 215, 0.4);
 }
 
 .ticket.urgent {
+  border-color: rgba(242, 85, 75, 0.7);
+  background: rgba(255, 220, 215, 0.42);
   animation: wobble 0.5s ease-in-out infinite;
 }
 
@@ -278,8 +289,8 @@ body,
 }
 
 .ticket-timer {
-  height: 8px;
-  background: #eee3cc;
+  height: 5px;
+  background: rgba(44, 44, 70, 0.12);
 }
 
 .ticket-timer div {
@@ -292,51 +303,56 @@ body,
 
 .ticket-dish {
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 36px;
+  height: 36px;
   margin: 2px auto 0;
+  filter: drop-shadow(0 1px 2px rgba(44, 44, 70, 0.18));
 }
 
 .ticket-name {
   display: block;
-  padding: 0 4px;
-  font-size: 10.5px;
+  padding: 0 3px;
+  font-size: 9px;
   line-height: 1.1;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--ink);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .ticket-parts {
   display: flex;
   justify-content: center;
   gap: 2px;
-  margin-top: 3px;
+  margin-top: 2px;
+  padding: 0 3px;
 }
 
 .ticket-part {
   position: relative;
-  width: 22px;
-  height: 22px;
-  border-radius: 7px;
-  background: #f4ead6;
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 .ticket-part img {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
 }
 
 .ticket-part .proc {
   position: absolute;
   right: -3px;
   bottom: -3px;
-  width: 12px;
-  height: 12px;
+  width: 11px;
+  height: 11px;
   padding: 1px;
   border-radius: 50%;
-  background: var(--ink);
+  background: rgba(44, 44, 70, 0.85);
   fill: #fff;
 }
 
@@ -344,9 +360,9 @@ body,
   position: absolute;
   left: -2px;
   top: -4px;
-  font-size: 10px;
+  font-size: 9px;
   color: #fff;
-  -webkit-text-stroke: 3px var(--ink);
+  -webkit-text-stroke: 2.5px var(--ink);
   paint-order: stroke fill;
 }
 
@@ -379,10 +395,11 @@ body,
   place-items: center;
   width: 78px;
   height: 78px;
-  border: 3px solid var(--ink);
+  border: 3px solid rgba(44, 44, 70, 0.7);
   border-radius: 50%;
-  background: var(--cream);
-  box-shadow: 0 4px 0 rgba(44, 44, 70, 0.25);
+  background: rgba(253, 246, 231, 0.58);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 3px 0 rgba(44, 44, 70, 0.14);
 }
 
 .clock-ring {
@@ -423,11 +440,13 @@ body,
   width: 44px;
   height: 44px;
   padding: 0;
-  border: 3px solid var(--ink);
+  border: 3px solid rgba(44, 44, 70, 0.7);
   border-radius: 14px;
-  background: var(--cream);
-  box-shadow: 0 4px 0 rgba(44, 44, 70, 0.25);
+  background: rgba(253, 246, 231, 0.72);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 0 rgba(44, 44, 70, 0.18);
   cursor: pointer;
+  pointer-events: auto;
   pointer-events: auto;
 }
 
@@ -936,24 +955,23 @@ body.touch #touch-controls.active {
   }
 
   .ticket {
-    width: 70px;
-    border-width: 2px;
-    border-radius: 11px;
+    width: 68px;
+    border-radius: 10px;
   }
 
   .ticket-dish {
-    width: 44px;
-    height: 44px;
+    width: 34px;
+    height: 34px;
   }
 
   .ticket-name {
-    display: none;
+    font-size: 8.5px;
   }
 
   .ticket-part,
   .ticket-part img {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
 
   .clock-face {
@@ -989,28 +1007,27 @@ body.touch #touch-controls.active {
 @media (max-height: 520px) and (min-width: 561px) {
   #tickets {
     min-height: 0;
-    gap: 5px;
+    gap: 4px;
   }
 
   .ticket {
     width: 64px;
-    border-width: 2px;
     border-radius: 10px;
   }
 
   .ticket-dish {
-    width: 38px;
-    height: 38px;
+    width: 32px;
+    height: 32px;
   }
 
   .ticket-name {
-    display: none;
+    font-size: 8px;
   }
 
   .ticket-part,
   .ticket-part img {
-    width: 15px;
-    height: 15px;
+    width: 13px;
+    height: 13px;
   }
 
   .clock-face {
@@ -1267,19 +1284,98 @@ body.touch.no-fullscreen:not(.standalone) .ios-hint {
     font-size: 18px;
   }
 
-  #hud-left,
-  #hud-right {
+  /* HUD overlays the kitchen; keep it compact but tickets stay readable. */
+  #hud {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     gap: 6px;
+    align-items: start;
+  }
+
+  #hud-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  #hud-right {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 6px;
+  }
+
+  #tickets {
+    min-height: 0;
+    gap: 4px;
+    flex-wrap: nowrap;
+    max-width: min(62vw, 360px);
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #bot-tickets {
+    display: none;
   }
 
   .ticket {
     width: 56px;
-    padding-bottom: 4px;
+    padding-bottom: 2px;
+    border-radius: 9px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0.14)),
+      rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.5);
   }
 
   .ticket-dish {
-    width: 34px;
-    height: 34px;
+    width: 26px;
+    height: 26px;
+    margin-top: 1px;
+  }
+
+  .ticket-name {
+    display: block;
+    font-size: 8px;
+    padding: 0 2px;
+  }
+
+  .ticket-parts {
+    display: flex;
+  }
+
+  .ticket-part,
+  .ticket-part img {
+    width: 13px;
+    height: 13px;
+  }
+
+  .ticket-part .proc {
+    width: 9px;
+    height: 9px;
+  }
+
+  .ticket-timer {
+    height: 3px;
+  }
+
+  .clock-face {
+    width: 52px;
+    height: 52px;
+  }
+
+  #timer-value {
+    font-size: 14px;
+  }
+
+  .coin-badge {
+    min-width: 72px;
+    background: rgba(253, 246, 231, 0.78);
+  }
+
+  .coin-name {
+    display: none;
   }
 
   .results-sub {
@@ -1290,34 +1386,51 @@ body.touch.no-fullscreen:not(.standalone) .ios-hint {
     gap: 10px;
   }
 
+  #touch-controls {
+    padding: 0 4px 2px;
+  }
+
   #touch-stick {
-    width: 112px;
+    width: 96px;
+    border-width: 2px;
+    background: rgba(253, 246, 231, 0.4);
   }
 
   #touch-buttons {
-    gap: 8px;
+    gap: 6px;
   }
 
   .touch-btn {
-    width: 58px;
-    height: 58px;
-    font-size: 13px;
+    width: 54px;
+    height: 54px;
+    font-size: 12px;
+    border-width: 2px;
+    box-shadow: 0 3px 0 rgba(44, 44, 70, 0.55);
+    background: rgba(99, 189, 246, 0.78);
+    backdrop-filter: blur(4px);
   }
 
   .touch-btn.big {
-    width: 74px;
-    height: 74px;
-    font-size: 16px;
+    width: 68px;
+    height: 68px;
+    font-size: 14px;
+    background: rgba(242, 109, 91, 0.82);
   }
 
   .touch-btn.small {
-    width: 48px;
-    height: 48px;
-    font-size: 11px;
+    width: 46px;
+    height: 46px;
+    font-size: 10px;
+    background: rgba(60, 196, 176, 0.82);
   }
 
   .icon-button {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .name-tag {
+    font-size: 11px;
+    padding: 1px 6px;
   }
 }

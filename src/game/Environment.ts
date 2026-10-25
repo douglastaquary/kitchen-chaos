@@ -15,11 +15,12 @@ export const SIDE_X = GRID_W / 2;
 export function buildEnvironment(lib: AssetLibrary): THREE.Group {
   const env = new THREE.Group();
 
+  // Apron of outer planks — only visible when the camera aspect leaves leftover edges.
   const planks = createPlankTexture();
-  planks.repeat.set(14, 10);
+  planks.repeat.set(GRID_W + 4, GRID_H + 3);
   const outer = new THREE.Mesh(
-    new THREE.PlaneGeometry(64, 44),
-    new THREE.MeshStandardMaterial({ map: planks, roughness: 0.85 }),
+    new THREE.PlaneGeometry(GRID_W + 6, GRID_H + 5),
+    new THREE.MeshStandardMaterial({ map: planks, roughness: 0.9, color: '#e8c9a0' }),
   );
   outer.rotation.x = -Math.PI / 2;
   outer.position.y = -0.02;

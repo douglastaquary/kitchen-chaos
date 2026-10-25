@@ -44,13 +44,15 @@ export const CHOP_TIME: Partial<Record<IngredientType, number>> = {
 };
 
 export const PAN_COOK_TIME = 6.5;
-export const PAN_BURN_TIME = 9;
+/** Seconds after the patty is cooked before it burns — long enough to plate on mobile. */
+export const PAN_BURN_TIME = 14;
 export const POT_RECIPES = {
   tomato: { needs: 3, state: 'chopped' as IngredientState, cookTime: 8, part: 'soup' as PlatePart },
   noodles: { needs: 2, state: 'raw' as IngredientState, cookTime: 7, part: 'noodles' as PlatePart },
 };
-export const POT_BURN_TIME = 11;
-export const BURN_WARNING = 4;
+/** Seconds after the pot finishes before it burns. */
+export const POT_BURN_TIME = 16;
+export const BURN_WARNING = 5;
 
 export function ingredient(type: IngredientType): Ingredient {
   return { kind: 'ingredient', type, state: 'raw', chop: 0 };

@@ -500,7 +500,17 @@ export class Game {
         this.vfx.poof(top);
         break;
       case 'deny':
-        if (isPlayer) this.audio.deny();
+        if (isPlayer) {
+          this.audio.deny();
+          const heat = station.heatState();
+          if ((station.kind === 'pan' || station.kind === 'pot') && (heat === 'done' || heat === 'warning')) {
+            this.floatAt(
+              top,
+              station.kind === 'pot' ? 'Need an empty plate!' : chef.held ? 'Drop first, then Grab!' : 'Grab the food!',
+              'info',
+            );
+          }
+        }
         chef.bump(0.15);
         break;
       case 'serveAttempt': {
@@ -562,9 +572,15 @@ export class Game {
     const top = this.kitchen!.worldTop(station, this.tmpV);
     if (ev === 'cookDone') {
       this.vfx.sparkle(top.setY(top.y + 0.3), '#c9ffb0');
-      if (mine) this.audio.ding();
+      if (mine) {
+        this.audio.ding();
+        this.floatAt(top, station.kind === 'pot' ? 'Ready — empty plate!' : 'Ready — Grab!', 'info');
+      }
     } else if (ev === 'burnWarning') {
-      if (mine) this.audio.alarm();
+      if (mine) {
+        this.audio.alarm();
+        this.floatAt(top, 'Hurry — almost burnt!', 'bad');
+      }
     } else if (ev === 'burnt') {
       this.vfx.poof(top);
       if (mine) {
@@ -619,35 +635,37 @@ export class Game {
 
   // ---------- Camera + render ----------
 
-  /** Fit the whole kitchen below the HUD for the current aspect ratio. */
+  /**
+   * Fit the kitchen to the full viewport. HUD/touch controls overlay the scene, so we do not
+   * reserve space for them — the brick apron only shows if the aspect leaves leftover edges.
+   */
   private fitCamera(): void {
     const w = this.canvas.clientWidth;
     const h = this.canvas.clientHeight;
-    const hudEl = document.querySelector<HTMLElement>('#hud');
-    const hudBottom = this.phase === 'title' || !hudEl || hudEl.classList.contains('hidden') ? 0 : hudEl.getBoundingClientRect().bottom;
-    const key = `${w}x${h}:${Math.round(hudBottom)}`;
+    const key = `${w}x${h}:${this.mobile.touch ? 1 : 0}`;
     if (key === this.cameraKey) return;
     this.cameraKey = key;
 
     const portrait = w / h < 1;
-    this.camera.fov = portrait ? 44 : 34;
+    const phoneLandscape = this.mobile.touch && !portrait && h <= 520;
+    this.camera.fov = portrait ? 42 : phoneLandscape ? 26 : 32;
     this.camera.updateProjectionMatrix();
-    const bottomLimit = -0.94;
-    // On touch landscape the stick and buttons sit in the bottom corners; keep the kitchen between them.
-    const sideLimit = this.mobile.touch && !portrait ? Math.max(0.5, 1 - (2 * 150) / w) : 0.97;
-    const topLimit = THREE.MathUtils.clamp(1 - (2 * (hudBottom + 6)) / h, 0.2, 0.95);
+
+    // Fill the screen edge-to-edge. On short phones, ignore width so height wins (sides may crop).
+    const bottomLimit = -0.995;
+    const topLimit = 0.995;
+    const sideLimit = phoneLandscape ? 99 : portrait ? 0.98 : this.mobile.touch ? 1.25 : 1.05;
+
     const hx = GRID_W / 2;
     const hz = GRID_H / 2;
     const points = [
-      new THREE.Vector3(-hx, 0, hz + 0.8),
-      new THREE.Vector3(hx, 0, hz + 0.8),
-      new THREE.Vector3(-hx, 1.0, hz + 0.1),
-      new THREE.Vector3(hx, 1.0, hz + 0.1),
-      new THREE.Vector3(-hx, 1.2, -hz),
-      new THREE.Vector3(hx, 1.2, -hz),
+      new THREE.Vector3(-hx, 0.85, hz),
+      new THREE.Vector3(hx, 0.85, hz),
+      new THREE.Vector3(-hx, 1.0, -hz),
+      new THREE.Vector3(hx, 1.0, -hz),
     ];
     const dir = new THREE.Vector3(0, Math.sin(CAMERA_PITCH), Math.cos(CAMERA_PITCH));
-    const target = new THREE.Vector3(0, 0, 0.3);
+    const target = new THREE.Vector3(0, 0.35, 0);
     const halfTan = Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2));
     const want = (topLimit + bottomLimit) / 2;
     const place = (d: number, shiftZ: number) => {
@@ -665,7 +683,6 @@ export class Game {
       }
       return { minY, maxY, maxX };
     };
-    // For a distance, slide the look target so the kitchen band is centred between the HUD and the bottom edge.
     const centred = (d: number) => {
       let shiftZ = 0;
       for (let i = 0; i < 8; i += 1) {
@@ -673,21 +690,40 @@ export class Game {
         shiftZ -= (((r.maxY + r.minY) / 2 - want) * d * halfTan) / Math.sin(CAMERA_PITCH);
       }
       const r = place(d, shiftZ);
-      return { shiftZ, ok: r.maxX <= sideLimit && r.minY >= bottomLimit && r.maxY <= topLimit };
+      const heightOk = r.minY >= bottomLimit && r.maxY <= topLimit;
+      const widthOk = r.maxX <= sideLimit;
+      return { shiftZ, ok: heightOk && widthOk, span: r.maxY - r.minY };
     };
+    const band = topLimit - bottomLimit;
     let lo = 4;
     let hi = 120;
-    for (let i = 0; i < 28; i += 1) {
-      const mid = (lo + hi) / 2;
-      if (centred(mid).ok) hi = mid;
-      else lo = mid;
+    if (phoneLandscape) {
+      // Pure height fit: find the closest distance whose projected kitchen height equals the screen.
+      for (let i = 0; i < 30; i += 1) {
+        const mid = (lo + hi) / 2;
+        if (centred(mid).span > band) lo = mid;
+        else hi = mid;
+      }
+    } else {
+      for (let i = 0; i < 28; i += 1) {
+        const mid = (lo + hi) / 2;
+        if (centred(mid).ok) hi = mid;
+        else lo = mid;
+      }
+      for (let i = 0; i < 24; i += 1) {
+        const c = centred(hi);
+        if (c.span >= band * 0.97 || hi < 6) break;
+        const next = hi * 0.96;
+        if (!centred(next).ok) break;
+        hi = next;
+      }
     }
     place(hi, centred(hi).shiftZ);
     this.camera.far = hi + 80;
     this.camera.updateProjectionMatrix();
     if (this.scene.fog instanceof THREE.Fog) {
-      this.scene.fog.near = hi + 6;
-      this.scene.fog.far = hi + 30;
+      this.scene.fog.near = hi + 8;
+      this.scene.fog.far = hi + 28;
     }
   }
 

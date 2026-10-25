@@ -80,9 +80,10 @@ export class Chef {
     this.handLRest.copy(this.handL.position);
     this.handRRest.copy(this.handR.position);
 
+    this.model.scale.setScalar(1.18);
     this.pivot.add(this.model);
     this.group.add(this.pivot);
-    this.holdAnchor.position.set(0, 0.5, 0.46);
+    this.holdAnchor.position.set(0, 0.55, 0.5);
     this.pivot.add(this.holdAnchor);
 
     this.ring = new THREE.Mesh(
@@ -216,23 +217,23 @@ export class Chef {
   }
 
   private findTarget(world: CollisionWorld): Station | null {
-    const probe = worldToTile(this.position.x + this.facing.x * 0.78, this.position.z + this.facing.y * 0.78);
+    const probe = worldToTile(this.position.x + this.facing.x * 0.9, this.position.z + this.facing.y * 0.9);
     const direct = world.stationAt(probe.x, probe.z);
-    if (direct) return direct;
+    // Prefer a ready cook station even if the facing probe hits a neighbour first.
     const { x: tx, z: tz } = this.tile();
-    let best: Station | null = null;
-    let bestScore = 0.35;
+    let best: Station | null = direct;
+    let bestScore = direct ? this.scoreStation(direct, 0.55) : 0.28;
     for (let dz = -1; dz <= 1; dz += 1) {
       for (let dx = -1; dx <= 1; dx += 1) {
-        if (!dx && !dz) continue;
         const s = world.stationAt(tx + dx, tz + dz);
         if (!s) continue;
         const c = tileToWorld(tx + dx, tz + dz, tmpVec);
         const vx = c.x - this.position.x;
         const vz = c.z - this.position.z;
         const len = Math.hypot(vx, vz);
-        if (len > 1.25) continue;
-        const score = (vx * this.facing.x + vz * this.facing.y) / len - len * 0.1;
+        if (len > 1.55) continue;
+        const facing = len > 0.001 ? (vx * this.facing.x + vz * this.facing.y) / len : 1;
+        const score = this.scoreStation(s, facing - len * 0.08);
         if (score > bestScore) {
           bestScore = score;
           best = s;
@@ -240,6 +241,14 @@ export class Chef {
       }
     }
     return best;
+  }
+
+  /** Ready pans/pots pull targeting so plating on mobile is less fiddly. */
+  private scoreStation(station: Station, base: number): number {
+    const heat = station.heatState();
+    if (heat === 'done') return base + 0.55;
+    if (heat === 'warning') return base + 0.7;
+    return base;
   }
 
   private animate(delta: number): void {
